@@ -1,10 +1,6 @@
 package top.niunaijun.blackbox.fake.service;
 
-import static android.content.pm.PackageManager.GET_META_DATA;
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-
 import android.Manifest;
-import android.app.ActivityManager;
 import android.app.IServiceConnection;
 import android.content.ComponentName;
 import android.content.IIntentReceiver;
@@ -46,15 +42,19 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.fake.hook.ScanClass;
 import top.niunaijun.blackbox.fake.service.context.providers.ContentProviderStub;
+import top.niunaijun.blackbox.proxy.ProxyActivity;
 import top.niunaijun.blackbox.proxy.ProxyManifest;
 import top.niunaijun.blackbox.proxy.record.ProxyBroadcastRecord;
 import top.niunaijun.blackbox.proxy.record.ProxyPendingActivityRecord;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 import top.niunaijun.blackbox.utils.Reflector;
+import top.niunaijun.blackbox.utils.Slog;
 import top.niunaijun.blackbox.utils.compat.ActivityManagerCompat;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
 import top.niunaijun.blackbox.utils.compat.ParceledListSliceCompat;
-import top.niunaijun.blackbox.utils.compat.TaskDescriptionCompat;
+
+import static android.content.pm.PackageManager.GET_META_DATA;
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 /**
  * Created by Milk on 3/30/21.
@@ -583,17 +583,6 @@ public class IActivityManagerProxy extends ClassInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             return PERMISSION_GRANTED;
-        }
-    }
-
-    // for < Android 10
-    @ProxyMethod("setTaskDescription")
-    public static class SetTaskDescription extends MethodHook {
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            ActivityManager.TaskDescription td = (ActivityManager.TaskDescription) args[1];
-            args[1] = TaskDescriptionCompat.fix(td);
-            return method.invoke(who, args);
         }
     }
 }
